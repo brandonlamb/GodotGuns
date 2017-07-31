@@ -14,10 +14,10 @@ export var size_scaling_velocity = [0.0,0.0]
 export var max_size_scale = [0.0,0.0]
 
 # death/kill/free() related vars
-export var kill_on_collide = false setget set_kill_on_collide
-export var kill_viewport_exit = true setget set_kill_viewport_exit
-export var kill_travel_dist = -1 setget set_kill_travel_dist
-export var kill_after_time = -1 setget set_kill_after_time
+export(bool) var kill_on_collide = false setget set_kill_on_collide
+export(bool) var kill_viewport_exit = true setget set_kill_viewport_exit
+export(int) var kill_travel_dist = -1 setget set_kill_travel_dist
+export(int) var kill_after_time = -1 setget set_kill_after_time
 
 var gun_shot_from = null
 var deleted = false
@@ -56,7 +56,7 @@ func _fixed_process(delta):
 	if _prev_pos != null and !deleted:
 		_traveled_dist += get_global_pos().distance_to(_prev_pos)
 
-		if(_traveled_dist >= kill_travel_dist):
+		if _traveled_dist >= kill_travel_dist:
 			kill()
 		else:
 			_prev_pos = get_global_pos()
@@ -73,6 +73,7 @@ func setup(shooting_gun):
 		parent = gun_shot_from.get_node(CHILD_BULLETS_NAME)
 	else:
 		parent = root_node
+
 	parent.add_child(self)
 
 	#set bullet position
@@ -171,21 +172,22 @@ func set_kill_viewport_exit(val):
 		if !_vis_notifier:
 			_vis_notifier = VisibilityNotifier2D.new()
 			add_child(_vis_notifier)
-		_vis_notifier.connect("exit_screen",self,"kill")
+		_vis_notifier.connect("exit_screen", self, "kill")
 	else:
 		if _vis_notifier:
-			_vis_notifier.disconnect("exit_screen",self,"kill")
+			_vis_notifier.disconnect("exit_screen", self, "kill")
 
 func resize_to(ref, resizable):
 	var size = ref.get_item_rect().size
-	var pos = -size/2
+	var pos = -size / 2
 	resizable.edit_set_rect(Rect2(pos,size))
 
-func kill(arg=null):
+func kill(arg = null):
 	#ensure freeing/signal only done once if multiple kill conditions are set up
-	if(deleted):
+	if deleted :
 		return
+
 	deleted = true
 
-	emit_signal("bullet_killed",self)
+	emit_signal("bullet_killed", self)
 	queue_free()

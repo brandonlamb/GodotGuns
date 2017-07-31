@@ -78,6 +78,8 @@ func fire():
 
 	var bullet = load(shots).instance()
 	bullet.setup(self)
+	#bullet.set_kill_after_time(2)
+	bullet.set_kill_travel_dist(2000)
 	bullets.append(bullet)
 
 	emit_signal("volley_fired", bullets)
@@ -87,12 +89,13 @@ func fire():
 	if ammo > 0:
 		ammo -= 1
 
-	#prepare to fire again if possible
+	# prepare to fire again if possible
 	if ammo + 1 > 0 and ammo <= 0:
 		emit_signal("out_of_ammo")
 		_timer_node.stop()
 	else:
 		_timer_node.stop()
+
 		if _ammo_left_in_clip <= 0:
 			emit_signal("clip_empty")
 			if auto_fire:

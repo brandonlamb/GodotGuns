@@ -32,7 +32,7 @@ script/script = ExtResource( 2 )
 
 [node name="enemy_ship" parent="." instance=ExtResource( 3 )]
 
-transform/pos = Vector2( 2463.3, 2826.34 )
+transform/pos = Vector2( 3657.18, 2238.69 )
 
 [node name="bullets" type="Node2D" parent="."]
 
