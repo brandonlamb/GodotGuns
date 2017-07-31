@@ -8,6 +8,7 @@
 
 [node name="player_ship" parent="." instance=ExtResource( 1 )]
 
+transform/pos = Vector2( 1576.24, 219.853 )
 script/script = ExtResource( 2 )
 
 [node name="camera" type="Camera2D" parent="player_ship"]
@@ -31,7 +32,7 @@ drag_margin/bottom = 0.2
 
 [node name="enemy_ship" parent="." instance=ExtResource( 3 )]
 
-transform/pos = Vector2( 100, 500 )
+transform/pos = Vector2( 329.116, 839.151 )
 
 [node name="bullets" type="Node2D" parent="."]
 
