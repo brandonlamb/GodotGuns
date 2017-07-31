@@ -3,7 +3,7 @@ extends Node2D
 onready var enemy_ship = get_node("../enemy_ship")
 
 func _ready():
-	get_node("Gun").connect("volley_fired", self, "set_targets")
+	get_node("weapon").connect("volley_fired", self, "set_targets")
 	set_process(true)
 	pass
 
