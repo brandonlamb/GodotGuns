@@ -24,8 +24,8 @@ export var kill_after_time = -1 setget set_kill_after_time
 
 #PID controller vars for torque value when bullet is tracking an object
 var _prev_error = 0
-var _P = 0 
-var _I = 0 
+var _P = 0
+var _I = 0
 var _D = 0
 #PID controller gain values
 var _PID_Kp = 1000.0
@@ -41,7 +41,7 @@ signal bullet_killed
 func setup(shooting_gun):
 	gun_shot_from = shooting_gun
 	set_z(min(get_z(),gun_shot_from.get_z()-1)) #ensure behind gun
-	
+
 	#choose parent
 	var parent = null
 	var root_node = gun_shot_from.get_node("/root")
@@ -50,17 +50,17 @@ func setup(shooting_gun):
 	else:
 		parent = root_node
 	parent.add_child(self)
-	
+
 	#set bullet position
 	var offset = Vector2(fire_pos_offset[0], fire_pos_offset[1])
 	if get_parent() == root_node:
 		offset +=gun_shot_from.get_node("GunSprite").get_global_pos()
 	set_pos(offset)
-	
+
 	set_global_rot(gun_shot_from.get_global_rot())
-	
+
 	_set_vel_from_angle(get_global_rot())
-	
+
 func _set_vel_from_angle(angle):
 	var speed = sqrt(get_linear_velocity().length_squared()) #magnitude of rigid body's linear velocity
 	var vx = speed * cos(-angle) #idk why this is negative?
@@ -78,7 +78,7 @@ func _scale_bullet():
 		if new_y > max_size_scale[1]:
 			new_y = size.y
 	set_scale(Vector2(new_x,new_y))
-	
+
 func _integrate_forces(state):
 	if size_scaling_velocity[0] != 0 and size_scaling_velocity[1] != 0:
 		_scale_bullet()
@@ -88,18 +88,18 @@ func _get_PID_output(currentError, delta):
 	_I += _P * delta
 	_D = (_P - _prev_error) / delta
 	_prev_error = currentError
-	   
+
 	return _P*_PID_Kp + _I*_PID_Ki + _D*_PID_Kd
 func _track_target(delta):
 	var angle_btw = get_global_pos().angle_to_point(target.get_global_pos()) + PI/2
 	var error = get_global_rot() - angle_btw
 	#deal with angle discontinuity
 	#https://stackoverflow.com/questions/10697844/how-to-deal-with-the-discontinuity-of-yaw-angle-at-180-degree
-	if(error > PI): 
+	if(error > PI):
 	   error = error - PI * 2
 	elif(error < -PI):
 	   error = error + PI * 2
-	
+
 	var torque = _get_PID_output(error,delta)
 	set_applied_torque(torque)
 	_set_vel_from_angle(get_global_rot())
@@ -120,7 +120,7 @@ func set_kill_after_time(val):
 	kill_after_time = val
 	if val > 0:
 		var timer = Timer.new()
-		timer.connect("timeout",self,"kill") 
+		timer.connect("timeout",self,"kill")
 		timer.set_one_shot(true)
 		timer.set_wait_time(kill_after_time)
 		add_child(timer)
@@ -143,7 +143,7 @@ func set_kill_viewport_exit(val):
 	else:
 		if _vis_notifier:
 			_vis_notifier.disconnect("exit_screen",self,"kill")
-	
+
 func _fixed_process(delta):
 	#increment travel distance if that is a death param
 	if _prev_pos != null and !deleted:
@@ -162,7 +162,7 @@ func _process(delta):
 func _ready():
 	set_process(true)
 	set_fixed_process(true)
-	
+
 	if fit_collider_to_sprite:
 		resize_to(get_node(sprite_node_name),get_node(collider_node_name))
 	pass
@@ -177,6 +177,6 @@ func kill(arg=null):
 	if(deleted):
 		return
 	deleted = true
-	
+
 	emit_signal("bullet_killed",self)
 	queue_free()

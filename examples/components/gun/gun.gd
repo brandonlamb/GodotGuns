@@ -7,7 +7,7 @@ export var fire_delay = 1.0
 export var reload_delay = 2.0
 export var ammo = -1 setget set_ammo
 export var clip_size = 1 setget set_clip_size
-export var shots = ["res://scenes/guns_and_bullets/Bullet.tscn"]
+export var shots = ["res://components/bullet/bullet.tscn"]
 
 var _ammo_left_in_clip = 1
 var _timer_node = null
@@ -45,37 +45,38 @@ func _ready():
 	var child_bullets = Node2D.new()
 	child_bullets.set_name("ChildBullets")
 	add_child(child_bullets)
-	child_bullets.set_owner(get_node("/root"))
-	
+	child_bullets.set_owner(get_node("/root/main/bullets"))
+
 	_timer_node = Timer.new()
 	add_child(_timer_node)
 	_timer_node.set_wait_time(fire_delay)
 	_timer_node.start()
 	_ammo_left_in_clip = clip_size
-	
-	_timer_node.connect("timeout", self, "set_can_fire",[true])
-	
+
+	_timer_node.connect("timeout", self, "set_can_fire", [true])
+
 	if auto_fire:
 		call_deferred("fire")
 	pass
 
 func fire():
 	if(!can_fire):
-		return 
-	
+		return
+
 	var bullets = []
 	for bullet_scene in shots:
+		#print("bullet_scene:", bullet_scene)
 		var bullet = load(bullet_scene).instance()
 		bullet.setup(self)
 		bullets.append(bullet)
 	emit_signal("volley_fired", bullets)
-	
+
 	set_can_fire(false)
 	_ammo_left_in_clip -= 1
 	if ammo > 0:
 		ammo -= 1
-	
-	#prepare to fire again if possible	
+
+	#prepare to fire again if possible
 	if (ammo + 1) > 0 and ammo <= 0:
 		emit_signal("out_of_ammo")
 		_timer_node.stop()
